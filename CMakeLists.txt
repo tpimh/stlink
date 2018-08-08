@@ -80,6 +80,7 @@ set(STLINK_SOURCE
 	src/sg.c
 	src/logging.c
 	src/flash_loader.c
+	src/tools/term.c
 )
 
 if (WIN32 OR MSYS OR MINGW)
@@ -159,7 +160,7 @@ if (APPLE)
 	find_library(IOKit IOKit)
 	target_link_libraries(${STLINK_LIB_STATIC} ${CoreFoundation} ${IOKit} ${ObjC})
 endif()
-	
+
 if (WIN32 OR MSYS OR MINGW)
 	target_link_libraries(${STLINK_LIB_STATIC} ${LIBUSB_LIBRARY} wsock32 ws2_32)
 else()
@@ -191,7 +192,14 @@ else()
 	target_link_libraries(st-info ${STLINK_LIB_SHARED})
 endif()
 
-install(TARGETS st-flash st-info
+add_executable(st-term src/tools/term.c)
+if (WIN32 OR APPLE)
+	target_link_libraries(st-term ${STLINK_LIB_STATIC})
+else()
+	target_link_libraries(st-term ${STLINK_LIB_SHARED})
+endif()
+
+install(TARGETS st-flash st-info st-term
 	RUNTIME DESTINATION bin
 )
 
